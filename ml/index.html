@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Management Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Page Guard - Must be loaded first for maintenance mode protection -->
+    <script src="common/page-guard.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">CML</div>
+                    <span class="logo-text">Character Manager</span>
+                </div>
+            </div>
+            <ul class="sidebar-nav">
+                <!-- Navigation items will be populated by DashboardNavigation component -->
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <!-- Header content will be populated by DashboardHeader component -->
+            </header>
+
+            <div class="content-area">
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <div class="welcome-text">
+                        <h2>Dashboard</h2>
+                        <p>Welcome to the Character Management System</p>
+                    </div>
+                    <div class="welcome-actions">
+                        <a href="upload.html" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>Upload Character
+                        </a>
+                        <a href="database.html" class="btn btn-outline">
+                            <i class="fas fa-database"></i>View Database
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <div class="stat-text">
+                                <p class="stat-label">Total Characters</p>
+                                <p class="stat-value"></p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Grid -->
+                <div class="main-grid">
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Quick Actions</h3>
+                        </div>
+                        <div class="card-content">
+                            <a href="upload.html" class="action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-upload"></i>
+                                </div>
+                                <div class="action-text">
+                                    <h4>Upload New Character</h4>
+                                    <p>Add a new character to the masterlist</p>
+                                </div>
+                            </a>
+                            <a href="database.html" class="action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="action-text">
+                                    <h4>Manage Characters</h4>
+                                    <p>View and edit existing characters</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-activity"></i>Recent Activity</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="activity-list">
+                                <!-- Loading placeholder - will be replaced by JavaScript -->
+                                <div class="activity-item">
+                                    <div class="activity-main">
+                                        <p class="activity-action">Loading recent activities...</p>
+                                        <div class="activity-meta">
+                                            <span class="activity-user">System</span>
+                                        </div>
+                                    </div>
+                                    <span class="activity-time">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Status -->
+                
+            </div>
+        </main>
+    </div>
+    
+    <!-- Dashboard JavaScript -->
+    <!-- Dashboard Initialization -->
+    <script type="module">
+        // Simplified dashboard initialization
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                console.log('🚀 Starting dashboard initialization...');
+                
+                // Load all components sequentially to avoid conflicts
+                await loadComponentsSequentially();
+                
+            } catch (error) {
+                console.error('❌ Dashboard initialization error:', error);
+                // Fallback to login if there's an initialization error
+                window.location.href = '../login.html';
+            }
+        });
+        
+        // Load dashboard components in proper sequence
+        async function loadComponentsSequentially() {
+            // Load header component first
+            await loadScript('components/header.js');
+            console.log('✅ Header component loaded');
+            
+            // Load navigation component
+            await loadScript('components/navigation.js');
+            console.log('✅ Navigation component loaded');
+            
+            // Load dashboard manager (this handles authentication)
+            await loadScript('dashboard.js', 'module');
+            console.log('✅ Dashboard script loaded');
+            
+            // Initialize components after all scripts are loaded
+            initializeComponents();
+            
+            // Initialize dashboard manager with authentication
+            setTimeout(async () => {
+                console.log('🚀 Initializing dashboard manager...');
+                try {
+                    const dashboardManager = new window.DashboardManager();
+                    const initialized = await dashboardManager.initialize();
+                    
+                    if (initialized !== false) {
+                        window.dashboardManager = dashboardManager;
+                        console.log('✅ Dashboard initialization complete');
+                    }
+                } catch (error) {
+                    console.error('❌ Error in dashboard initialization:', error);
+                    window.location.href = '../login.html';
+                }
+            }, 300);
+        }
+        
+        // Helper function to load scripts with promises
+        function loadScript(src, type = null) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                if (type) script.type = type;
+                
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+                
+                document.head.appendChild(script);
+            });
+        }
+        
+        // Initialize dashboard components
+        function initializeComponents() {
+            try {
+                // Initialize header
+                const header = new DashboardHeader({
+                    pageTitle: 'Character Management System',
+                    showSwitchAccount: true
+                });
+                
+                // Store header reference globally
+                window.dashboardHeader = header;
+                
+                // Initialize navigation
+                const navigation = new DashboardNavigation({
+                    currentPage: 'index.html'
+                });
+                
+                // Store navigation reference globally for dashboard manager
+                window.dashboardNavigation = navigation;
+                
+                console.log('✅ Dashboard components initialized');
+            } catch (error) {
+                console.error('❌ Error initializing components:', error);
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - Character Management Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Page Guard - Must be loaded first for maintenance mode protection -->
+    <script src="common/page-guard.js"></script>
+    
+    <style>
+        /* Profile Settings Specific Styles */
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .profile-card h3 {
+            margin: 0 0 20px 0;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: var(--input-background);
+            color: var(--text-primary);
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+        
+        .password-input-wrapper .form-input {
+            padding-right: 48px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(82, 82, 82, 0.1);
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-buttons {
+            display: flex;
+            gap: 8px;
+            margin-left: 8px;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--secondary-background);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-sm:hover {
+            background: var(--hover-background);
+            border-color: var(--primary-color);
+        }
+
+        .btn-sm:active {
+            transform: translateY(1px);
+        }
+
+        .btn-sm i {
+            font-size: 0.7rem;
+        }
+
+        .password-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+        }
+        
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: color 0.2s ease;
+            z-index: 2;
+        }
+        
+        .password-toggle-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        .password-toggle-btn:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .feedback {
+            margin-top: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            display: none;
+            clear: both;
+            position: relative;
+            z-index: 0;
+            width: 100%;
+            box-sizing: border-box;
+            word-wrap: break-word;
+        }
+
+        .feedback.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .feedback.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .feedback.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .current-info {
+            background: var(--muted-background);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .current-info strong {
+            color: var(--text-primary);
+        }
+
+        .password-requirements {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .save-button {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .message-container {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .alert.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .alert.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .section-description {
+            margin: 0 0 16px 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">MF</div>
+                    <span class="logo-text">MonFleur</span>
+                </div>
+            </div>
+            <nav>
+                <ul class="sidebar-nav">
+                    <!-- Navigation items will be populated by DashboardNavigation component -->
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <!-- Footer content can be added here if needed -->
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <!-- Header content will be populated by DashboardHeader component -->
+            </header>
+            
+            <div class="content-area">
+                <div class="content-header">
+                    <!-- <h2>Profile Settings</h2>
+                    <p>Manage your profile information and account settings</p> -->
+                </div>
+
+                <div class="profile-container">
+                <!-- Message Container -->
+                <div class="message-container">
+                    <div id="alertMessage" class="alert"></div>
+                </div>
+
+                <!-- Current Profile Info -->
+                <div class="profile-card">
+                    <h3><i class="fas fa-info-circle"></i>Current Profile Information</h3>
+                    <div class="current-info">
+                        <p><strong>Email:</strong> <span id="currentEmail">Loading...</span></p>
+
+                        <p><strong>Username:</strong> <span id="currentUsername">Loading...</span></p>
+                        <p><strong>Role:</strong> <span id="currentRole">Loading...</span></p>
+                    </div>
+                </div>
+
+                <!-- Profile Settings Form -->
+                <form id="profileSettingsForm">
+                    <!-- Username Section -->
+                    <div class="profile-card">
+                        <h3><i class="fas fa-at"></i>Username</h3>
+                        <div class="form-group">
+                            <label for="username" class="form-label">Username *</label>
+                            <div class="input-group">
+                                <input type="text" id="username" name="username" class="form-input" 
+                                       placeholder="Enter your username" required>
+                                <div class="input-buttons">
+                                    <button type="button" id="generateUsername" class="btn-sm" title="Generate new username">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                    <button type="button" id="copyUsername" class="btn-sm" title="Copy username">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="usernameFeedback" class="feedback"></div>
+                        </div>
+                    </div>
+
+                    <!-- Password Section -->
+                    <div class="profile-card">
+                        <h3><i class="fas fa-lock"></i>Change Password (Optional)</h3>
+                        <p class="section-description">Leave password fields empty if you only want to change your username.</p>
+                        <div class="form-group">
+                            <label for="currentPassword" class="form-label">Current Password</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="currentPassword" name="currentPassword" class="form-input" 
+                                       placeholder="Enter your current password">
+                                <button type="button" class="password-toggle-btn" data-target="currentPassword" title="Show/Hide Password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div id="currentPasswordFeedback" class="feedback"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword" class="form-label">New Password</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="newPassword" name="newPassword" class="form-input" 
+                                       placeholder="Enter your new password">
+                                <button type="button" class="password-toggle-btn" data-target="newPassword" title="Show/Hide Password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-requirements">
+                                Minimum 6 characters required
+                            </div>
+                            <div id="newPasswordFeedback" class="feedback"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" 
+                                       placeholder="Confirm your new password">
+                                <button type="button" class="password-toggle-btn" data-target="confirmPassword" title="Show/Hide Password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div id="confirmPasswordFeedback" class="feedback"></div>
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <button type="submit" class="btn btn-primary save-button" id="saveProfileButton">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Logout modal is now handled by the header component -->
+        </main>
+    </div>
+
+    <!-- Header Component -->
+    <script src="components/header.js"></script>
+    <!-- Navigation Component -->
+    <script src="components/navigation.js"></script>
+    <script>
+        // Initialize header and navigation components
+        document.addEventListener('DOMContentLoaded', async function() {
+            window.dashboardHeaderInstance = new DashboardHeader({
+                pageTitle: 'Profile Settings',
+                userRole: 'Moderator',
+                showSwitchAccount: true
+            });
+            
+            // Initialize navigation with async role loading
+            const navigation = new DashboardNavigation({
+                currentPage: 'profile-settings.html'
+            });
+            // Navigation init is now async and handles role loading internally
+        });
+    </script>
+    <script type="module" src="profile-settings.js"></script>
+</body>
+</html>
